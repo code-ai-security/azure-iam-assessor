@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AzIAM Assessor</title>
+<link rel="stylesheet" href="styles.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.30.2/cytoscape.min.js"></script>
+</head>
+<body>
+<header class="app">
+  <div class="logo">AzIAM&nbsp;Assessor</div>
+  <div class="meta" id="hdrMeta">loading…</div>
+  <div class="spacer"></div>
+  <div class="risk" id="riskWrap" title="Overall risk score">
+    <div class="ring" id="riskRing"><span id="riskNum">–</span></div>
+    <div class="meta">RISK<br>SCORE</div>
+  </div>
+  <button class="btn primary" id="btnReport">⬇ Download HTML Report</button>
+</header>
+
+<nav class="tabs" id="tabs">
+  <button data-tab="overview" class="active">Overview</button>
+  <button data-tab="findings">Findings <span class="badge-count" id="cntFindings">0</span></button>
+  <button data-tab="attack">Attack Paths <span class="badge-count" id="cntPaths">0</span></button>
+  <button data-tab="rightsizing">SP Right-Sizing <span class="badge-count" id="cntRS">0</span></button>
+  <button data-tab="graph">Network Graph</button>
+  <button data-tab="identities">Identities <span class="badge-count" id="cntIdent">0</span></button>
+  <button data-tab="roles">Role Assignments <span class="badge-count" id="cntRoles">0</span></button>
+  <button data-tab="dirroles">Directory Roles</button>
+  <button data-tab="resources">Resources <span class="badge-count" id="cntRes">0</span></button>
+</nav>
+
+<main>
+  <!-- OVERVIEW -->
+  <section class="tabpane active" id="tab-overview">
+    <div class="grid stats" id="statGrid"></div>
+    <div class="card" style="margin-top:16px">
+      <h2 class="section">Findings by severity</h2>
+      <div class="sevbar" id="sevBar"></div>
+      <div class="legend" id="sevLegend" style="margin-top:12px"></div>
+    </div>
+    <div class="grid" style="grid-template-columns:1fr 1fr; margin-top:16px">
+      <div class="card"><h2 class="section">Top risks</h2><div id="topRisks"></div></div>
+      <div class="card"><h2 class="section">Tenant</h2><div id="tenantInfo"></div></div>
+    </div>
+  </section>
+
+  <!-- FINDINGS -->
+  <section class="tabpane" id="tab-findings">
+    <div class="toolbar">
+      <input id="findSearch" placeholder="Search findings…">
+      <select id="findSev"><option value="">All severities</option><option>Critical</option><option>High</option><option>Medium</option><option>Low</option></select>
+      <select id="findCat"><option value="">All categories</option></select>
+    </div>
+    <div id="findingsList"></div>
+  </section>
+
+  <!-- ATTACK PATHS -->
+  <section class="tabpane" id="tab-attack">
+    <h2 class="section">Control paths reaching Tier-0 assets</h2>
+    <div id="pathsList"></div>
+  </section>
+
+  <!-- SP RIGHT-SIZING -->
+  <section class="tabpane" id="tab-rightsizing">
+    <div class="card" style="margin-bottom:14px">
+      <h2 class="section">Least-privilege right-sizing — granted (config) vs used (logs)</h2>
+      <div id="rsBanner" class="meta"></div>
+    </div>
+    <div class="toolbar">
+      <input id="rsSearch" placeholder="Search service principals…">
+      <select id="rsVerdict"><option value="">All verdicts</option></select>
+      <select id="rsSort"><option value="overprivilege">Sort: over-privilege</option><option value="displayName">Sort: name</option></select>
+    </div>
+    <div id="rsList"></div>
+  </section>
+
+  <!-- GRAPH -->
+  <section class="tabpane" id="tab-graph">
+    <div class="graph-controls">
+      <select id="graphLayout"><option value="cose">Force layout</option><option value="concentric">Concentric (tier)</option><option value="breadthfirst">Hierarchy</option></select>
+      <label class="tag"><input type="checkbox" id="onlyRisk"> Only risky/tier-0 nodes</label>
+      <button class="btn" id="graphFit">Fit</button>
+      <span class="meta" id="graphInfo"></span>
+    </div>
+    <div class="legend" id="graphLegend"></div>
+    <div id="cy"></div>
+  </section>
+
+  <!-- IDENTITIES -->
+  <section class="tabpane" id="tab-identities">
+    <div class="toolbar">
+      <input id="identSearch" placeholder="Search identities…">
+      <select id="identType"><option value="">All types</option><option>User</option><option>Group</option><option>ServicePrincipal</option><option>ManagedIdentity</option></select>
+    </div>
+    <div class="card" style="padding:0; overflow:auto; max-height:70vh"><table id="identTable"></table></div>
+  </section>
+
+  <!-- ROLES -->
+  <section class="tabpane" id="tab-roles">
+    <div class="toolbar">
+      <input id="roleSearch" placeholder="Search role assignments…">
+      <select id="roleScope"><option value="">All scope levels</option></select>
+    </div>
+    <div class="card" style="padding:0; overflow:auto; max-height:70vh"><table id="roleTable"></table></div>
+  </section>
+
+  <!-- DIRECTORY ROLES -->
+  <section class="tabpane" id="tab-dirroles">
+    <div class="card" style="padding:0; overflow:auto; max-height:75vh"><table id="dirTable"></table></div>
+  </section>
+
+  <!-- RESOURCES -->
+  <section class="tabpane" id="tab-resources">
+    <div class="toolbar">
+      <input id="resSearch" placeholder="Search resources…">
+      <select id="resType"><option value="">All types</option></select>
+    </div>
+    <div class="card" style="padding:0; overflow:auto; max-height:70vh"><table id="resTable"></table></div>
+  </section>
+
+  <footer>AzIAM Assessor — defensive IAM assessment. Review findings with your security team before acting.</footer>
+</main>
+
+<script src="data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
